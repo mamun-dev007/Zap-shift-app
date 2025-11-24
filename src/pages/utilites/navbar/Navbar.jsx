@@ -23,7 +23,7 @@ const Navbar = () => {
         <NavLink>Services</NavLink>
       </li>
       <li>
-        <NavLink to="/coverage">Coverage</NavLink>
+        <NavLink to="/sendParcel">SendParcel</NavLink>
       </li>
       <li>
         <NavLink>About Us</NavLink>
@@ -34,6 +34,15 @@ const Navbar = () => {
       <li>
         <NavLink>Be a Rider</NavLink>
       </li>
+{
+  user && 
+  <li>
+        <NavLink to="/dashboardLayout/myPercels">My Percels</NavLink>
+      </li>
+}
+
+
+
     </>
   );
   return (
@@ -77,14 +86,14 @@ const Navbar = () => {
             Logout
           </button>
         ) : (
-          <NavLink to="/login" className="btn">
+          <Link to="/login" className="btn">
             Login
-          </NavLink>
+          </Link>
         )}
         
-        <NavLink to="/rider" className="btn btn-primary rounded">
+        <Link to="/rider" className="btn btn-primary rounded">
           Be a Rider
-        </NavLink>
+        </Link>
       </div>
     </div>
   );

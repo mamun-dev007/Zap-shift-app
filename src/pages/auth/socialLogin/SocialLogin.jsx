@@ -20,8 +20,8 @@ const SocialLogin = () => {
   return (
     <div className="text-center">
       <p className="text-center text-xl py-1">or</p>
-      {/* Google */}
-      <button
+      
+      <button type="button"
         onClick={handleSigninGoogle}
         className="btn bg-white text-black border-[#e5e5e5]"
       >

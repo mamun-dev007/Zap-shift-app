@@ -8,7 +8,11 @@ import AuthLayout from "../layouts/AuthLayout";
 import Login from "../pages/auth/login/Login";
 import Register from "../pages/auth/register/Register";
 import PrivateRoute from "./PrivateRoute";
-import Rider from "../rider/Rider";
+import Rider from "../pages/rider/Rider";
+import SendParcel from "../pages/sendParcel/SendParcel";
+import DashboardLayout from "../layouts/DashboardLayout";
+import Mypercels from "../pages/dashboard/myPercels/Mypercels";
+import Payment from "../pages/dashboard/myPercels/payment/Payment";
 
 const Router = createBrowserRouter([
   {
@@ -32,6 +36,15 @@ const Router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "/sendParcel",
+        element: (
+          <PrivateRoute>
+            <SendParcel></SendParcel>
+          </PrivateRoute>
+        ),
+        loader: () => fetch("/warehouses.json").then((res) => res.json()),
+      },
     ],
   },
   {
@@ -43,8 +56,27 @@ const Router = createBrowserRouter([
         Component: Login,
       },
       {
-        path: "/register",
+        path: "register",
         Component: Register,
+      },
+    ],
+  },
+
+  {
+    path: "dashboardLayout",
+    element: (
+      <PrivateRoute>
+        <DashboardLayout></DashboardLayout>
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        path: 'mypercels',
+        Component:Mypercels,
+      },
+      {
+        path: 'payment/:percelId',
+        Component:Payment,
       },
     ],
   },
