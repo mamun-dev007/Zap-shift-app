@@ -1,7 +1,7 @@
 import { control } from "leaflet";
-import React from "react";
+import React, {  } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { useLoaderData } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import useAxios from "../../hooks/useAxios";
 import useAuth from "../../hooks/useAuth";
@@ -14,67 +14,72 @@ const SendParcel = () => {
     // formState: { errors },
   } = useForm();
   const axiosSecure = useAxios();
-  const {user}= useAuth()
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const serviceCenter = useLoaderData();
   // console.log(serviceCenter)
   const regionDuplicate = serviceCenter.map((service) => service.region);
   const regions = [...new Set(regionDuplicate)];
-  const senderRegion = useWatch({control, name:'senderRegion'});
-  const receiverRegion = useWatch({control, name:'receiverRegion'});
-  
-  const districtByRegion = (region)=>{
-    const districtRegion = serviceCenter.filter (c => c.region=== region);
-    const districts = districtRegion.map(d => d.district);
-    return districts;
-  }
+  const senderRegion = useWatch({ control, name: "senderRegion" });
+  const receiverRegion = useWatch({ control, name: "receiverRegion" });
 
+  const districtByRegion = (region) => {
+    const districtRegion = serviceCenter.filter((c) => c.region === region);
+    const districts = districtRegion.map((d) => d.district);
+    return districts;
+  };
 
   const handleSendPercl = (data) => {
-const isSameDistrict = data.senderDistrict === data.receiverDistrict;
-const isDocument = data.parcelType === "document";
-const  parcelWeight = parseFloat(data.parcelWeight);
+    const isSameDistrict = data.senderDistrict === data.receiverDistrict;
+    const isDocument = data.parcelType === "document";
+    const parcelWeight = parseFloat(data.parcelWeight);
 
-let cost = 0;
+    let cost = 0;
 
-  if(isDocument){
-cost  = isSameDistrict? 60: 80 ;
-  }else{
-    if(parcelWeight <= 3){
-      cost = isSameDistrict ? 110 :150;
-    }else{
-      const minCharge = isSameDistrict ? 110 : 150;
-      const extraWeight = parcelWeight - 3;
-      const extraCharge = isSameDistrict ? extraWeight * 40 : extraWeight * 40 + 40 ;
+    if (isDocument) {
+      cost = isSameDistrict ? 60 : 80;
+    } else {
+      if (parcelWeight <= 3) {
+        cost = isSameDistrict ? 110 : 150;
+      } else {
+        const minCharge = isSameDistrict ? 110 : 150;
+        const extraWeight = parcelWeight - 3;
+        const extraCharge = isSameDistrict
+          ? extraWeight * 40
+          : extraWeight * 40 + 40;
 
-      cost = minCharge+ extraCharge; 
+        cost = minCharge + extraCharge;
+      }
     }
-  }
-  data.cost = cost;
-Swal.fire({
-  title: "Agree with the cost ",
-  text: `You have to pay ${cost} taka`,
-  icon: "warning",
-  showCancelButton: true,
-  confirmButtonColor: "#3085d6",
-  cancelButtonColor: "#d33",
-  confirmButtonText: "I agree"
-}).then((result) => {
-  if (result.isConfirmed) {
-
-axiosSecure.post('/percels',data)
-.then(res=>{
-  console.log('after',res.data)});
-
-
-    // Swal.fire({
-    //   title: "success!",
-    //   text: "Your parcel has been successfully.",
-    //   icon: "success"
-    // });
-  }
-});
+    data.cost = cost;
+    Swal.fire({
+      title: "Agree with the cost ",
+      text: `You have to pay ${cost} taka`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "I agree",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axiosSecure.post("/percels", data).then((res) => {
+          console.log("after", res.data);
+navigate('/dashboardLayout/mypercels')
+          if (res.data.insertedId) {
+            Swal.fire({
+              icon: "success",
+              title: "Your work has been saved",
+              showConfirmButton: false,
+              timer: 2500,
+            });
+          }
+        });
+      }
+    });
   };
+
+  
   return (
     <div className="bg-gray-100 max-w-7xl md:max-w-4xl mx-auto p-4 text-black  ">
       <h2 className="text-5xl font-bold mt-10">Send A Parcel</h2>
@@ -110,12 +115,15 @@ axiosSecure.post('/percels',data)
             <label className="label text-black font-semibold ">
               parcel Name
             </label>
+            
             <input
               type="text"
               {...register("parcelName")}
               className="input w-full "
               placeholder="parcel name"
+              required
             />
+            
           </fieldset>
           <fieldset className="fieldset">
             <label className="label text-black font-semibold ">
@@ -159,7 +167,11 @@ axiosSecure.post('/percels',data)
             </fieldset>
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Sender region</legend>
-              <select {...register('senderRegion')} defaultValue="Pick a region" className="select w-full">
+              <select
+                {...register("senderRegion")}
+                defaultValue="Pick a region"
+                className="select w-full"
+              >
                 <option disabled={true}>Pick a region</option>
                 {regions.map((r, i) => (
                   <option key={i} value={r}>
@@ -170,7 +182,11 @@ axiosSecure.post('/percels',data)
             </fieldset>
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Sender district</legend>
-              <select {...register('senderDistrict')} defaultValue="Pick a district" className="select w-full">
+              <select
+                {...register("senderDistrict")}
+                defaultValue="Pick a district"
+                className="select w-full"
+              >
                 <option disabled={true}>Pick a district</option>
                 {districtByRegion(senderRegion).map((r, i) => (
                   <option key={i} value={r}>
@@ -179,7 +195,6 @@ axiosSecure.post('/percels',data)
                 ))}
               </select>
             </fieldset>
-
 
             <fieldset className="fieldset">
               <label className="label text-black font-semibold ">
@@ -242,7 +257,11 @@ axiosSecure.post('/percels',data)
             </fieldset>
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Receiver region</legend>
-              <select {...register('receiverRegion')} defaultValue="Pick a region" className="select w-full">
+              <select
+                {...register("receiverRegion")}
+                defaultValue="Pick a region"
+                className="select w-full"
+              >
                 <option disabled={true}>Pick a region</option>
                 {regions.map((r, i) => (
                   <option key={i} value={r}>
@@ -253,7 +272,11 @@ axiosSecure.post('/percels',data)
             </fieldset>
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Receiver district</legend>
-              <select {...register('receiverDistrict')} defaultValue="Pick a district" className="select w-full">
+              <select
+                {...register("receiverDistrict")}
+                defaultValue="Pick a district"
+                className="select w-full"
+              >
                 <option disabled={true}>Pick a district</option>
                 {districtByRegion(receiverRegion).map((r, i) => (
                   <option key={i} value={r}>
@@ -298,7 +321,7 @@ axiosSecure.post('/percels',data)
             </fieldset>
           </div>
         </div>
-        <button className="btn btn-primary mt-4">Login</button>
+        <button className="btn btn-primary mt-4">Send Parcel</button>
       </form>
     </div>
   );

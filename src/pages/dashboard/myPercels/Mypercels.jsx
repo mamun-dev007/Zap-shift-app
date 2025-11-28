@@ -42,12 +42,25 @@ const Mypercels = () => {
           icon: "success"
         });
         }
-        });
-
-        
+        });        
       }
     });
   };
+
+  const handlePayment = async (percel)=>{
+const paymentInfo={
+  cost:percel.cost ,
+  percelId : percel._id,
+  senderEmail: percel.senderEmail,
+  parcelName: percel.parcelName,
+}
+
+const res = await axios.post('/create-checkout-session',paymentInfo);
+console.log("server response ->", res.data);
+window.location.assign(res.data.url);
+}
+
+
 
   return (
     <div>
@@ -76,7 +89,7 @@ const Mypercels = () => {
                 percel.paymentStatus=== 'paid'?
                 <span className="text-green-500">paid</span>
                 :
-                <Link to={`/dashboardLayout/payment/${percel._id}`}><button class="btn btn-sm bg-amber-100 text-black">pay</button></Link>
+                <button onClick={()=>handlePayment(percel)}className="btn btn-sm bg-amber-100 text-black">pay</button>
                 }</td>
                 <td>{percel.deliveryStatus}</td>
                 <td className="gap-5 flex">

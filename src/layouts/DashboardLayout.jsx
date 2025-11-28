@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaAccessibleIcon } from 'react-icons/fa';
+import { FaAccessibleIcon, FaRegCreditCard } from 'react-icons/fa';
 import { Link, NavLink, Outlet } from 'react-router';
 
 const DashboardLayout = () => {
@@ -32,9 +32,13 @@ const DashboardLayout = () => {
             <span className="is-drawer-close:hidden">Homepage</span>
           </Link>
         </li>
-
+{/* mypercels */}
   <li><NavLink to='/dashboardLayout/mypercels' className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="mypercels"><FaAccessibleIcon />
   <span className="is-drawer-close:hidden">Mypercels</span>
+  </NavLink></li>
+{/* paymentHistory */}
+  <li><NavLink to='/dashboardLayout/paymentHistory' className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="paymentHistory"><FaRegCreditCard/>
+  <span className="is-drawer-close:hidden">PaymentHistory</span>
   </NavLink></li>
 
         {/* List item */}
